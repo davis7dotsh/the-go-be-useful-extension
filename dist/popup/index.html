@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Focus</title>
+  <link rel="preload" href="../assets/Geist.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <header>
+      <div><h1>Focus</h1><p id="session" class="session" role="status">Loading…</p></div>
+      <button id="toggle" class="toggle" type="button" role="switch" aria-checked="false" aria-label="Turn Focus on" disabled><span></span></button>
+    </header>
+    <div class="duration-row">
+      <label for="duration">Duration</label>
+      <select id="duration" disabled>
+        <option value="">Until stopped</option>
+        <option value="25">25 min</option>
+        <option value="50">50 min</option>
+        <option value="90">90 min</option>
+      </select>
+    </div>
+    <ul class="policies" aria-label="Focus restrictions">
+      <li><span class="app"><img src="../assets/x.svg" width="18" height="18" alt="">X</span><span>Your posts + compose</span></li>
+      <li><span class="app"><img src="../assets/instagram.svg" width="18" height="18" alt="">Instagram</span><span>Blocked</span></li>
+      <li><span class="app"><img src="../assets/youtube.svg" width="20" height="20" alt="">YouTube</span><span>Studio only</span></li>
+    </ul>
+    <div id="problem" class="error" role="alert" hidden><p id="error"></p><button id="retry" type="button">Retry</button></div>
+  </main>
+  <script src="index.js"></script>
+</body>
+</html>

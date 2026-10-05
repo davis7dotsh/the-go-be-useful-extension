@@ -1,0 +1,23 @@
+@font-face {
+  font-family: "Geist";
+  src: url("Geist.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+* { box-sizing: border-box; }
+:root {
+  color-scheme: dark;
+  font-family: "Geist", -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #ededed;
+  background: #111113;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  --accent: #4DABF7;
+  --muted: #939398;
+  --line: #29292d;
+  --surface: #1b1b1e;
+}
+button, select, a { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+[hidden] { display: none !important; }

@@ -1,0 +1,23 @@
+{
+  "name": "the-go-be-useful-extension",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Focus: local posting-only X and distraction blocking for Helium and Zen",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "build:zen": "node scripts/build.mjs zen"
+  },
+  "devDependencies": {
+    "@types/chrome": "latest",
+    "@types/node": "latest",
+    "esbuild": "latest",
+    "tsx": "latest",
+    "typescript": "latest",
+    "jsdom": "latest",
+    "@types/jsdom": "latest"
+  },
+  "license": "MIT"
+}

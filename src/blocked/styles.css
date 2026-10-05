@@ -1,0 +1,13 @@
+@import url("../assets/theme.css");
+body { margin: 0; min-height: 100vh; display: grid; place-items: center; }
+main { width: min(100% - 48px, 460px); text-align: center; padding: 48px 0; }
+.mark { width: 8px; height: 8px; margin: 0 auto 24px; border-radius: 50%; background: var(--accent); }
+h1 { font-size: clamp(30px, 6vw, 38px); font-weight: 550; letter-spacing: -1.2px; margin: 0; }
+.remaining { color: var(--muted); margin: 12px 0 28px; min-height: 22px; font-size: 14px; font-variant-numeric: tabular-nums; }
+.actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+button, a { display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; min-height: 40px; border: 1px solid var(--line); border-radius: 8px; font: inherit; font-size: 13px; text-decoration: none; color: #ededed; background: var(--surface); cursor: pointer; }
+a { border-color: var(--accent); background: var(--accent); color: #071522; font-weight: 550; }
+button:hover { background: #27272b; }
+a:hover { background: #79bfff; }
+button:disabled { opacity: .5; cursor: default; }
+.error { color: #ffaaa2; font-size: 13px; line-height: 1.5; min-height: 40px; margin: 20px 0 0; overflow-wrap: anywhere; }

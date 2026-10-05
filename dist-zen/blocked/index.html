@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Focus</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <div class="mark" aria-hidden="true"></div>
+    <h1 id="heading">Focus is on.</h1>
+    <p id="remaining" class="remaining" role="status">Checking session…</p>
+    <div class="actions">
+      <a id="studio" href="https://studio.youtube.com/" hidden>Open YouTube Studio</a>
+      <button id="stop" type="button" disabled>Stop Focus</button>
+    </div>
+    <p id="error" class="error" role="alert"></p>
+  </main>
+  <script src="index.js"></script>
+</body>
+</html>

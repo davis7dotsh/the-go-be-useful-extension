@@ -1,0 +1,19 @@
+@font-face { font-family: "Focus Geist"; src: url("__FOCUS_FONT_URL__") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
+html[data-focus-active] body { visibility: hidden !important; background: transparent !important; position: relative !important; z-index: 2147483645 !important; }
+html[data-focus-active] body * { visibility: hidden !important; pointer-events: none !important; }
+html[data-focus-active] body [data-focus-allowed],
+html[data-focus-active] body [data-focus-allowed] * { visibility: visible !important; pointer-events: auto !important; }
+html[data-focus-active] body [data-focus-denied],
+html[data-focus-active] body [data-focus-denied] * { visibility: hidden !important; pointer-events: none !important; }
+#focus-cover { all: initial; display: flex !important; position: fixed !important; inset: 0 !important; z-index: 2147483644 !important; align-items: center !important; justify-content: center !important; background: #111113 !important; color: #ededed !important; font: 16px/1.5 "Focus Geist", system-ui, sans-serif !important; }
+#focus-cover * { box-sizing: border-box; }
+#focus-cover [hidden] { display: none !important; }
+#focus-cover .focus-panel { width: min(420px, calc(100vw - 48px)); text-align: center; }
+#focus-cover h1 { color: #ededed; font: 600 26px/1.25 "Focus Geist", system-ui, sans-serif; margin: 0 0 16px; }
+#focus-cover p { color: #939398; font: 400 16px/1.5 "Focus Geist", system-ui, sans-serif; margin: 0 0 24px; }
+#focus-cover button { border: 0; background: #4DABF7; color: #111; border-radius: 8px; padding: 12px 20px; font: 600 15px/1.2 "Focus Geist", system-ui, sans-serif; cursor: pointer; }
+#focus-cover button:focus-visible { outline: 2px solid #4DABF7; outline-offset: 4px; }
+#focus-cover button:disabled { opacity: .6; cursor: default; }
+
+#focus-compose-control { position: fixed !important; bottom: 24px !important; right: 24px !important; z-index: 2147483647 !important; padding: 12px 20px !important; border: 0 !important; border-radius: 8px !important; background: #4DABF7 !important; color: #111 !important; font: 600 15px/1.2 "Focus Geist", system-ui, sans-serif !important; cursor: pointer !important; }
+#focus-compose-control[hidden] { display: none !important; }
