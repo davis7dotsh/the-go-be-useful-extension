@@ -15,7 +15,7 @@ No server, tracking, account, or API keys. Sessions stay in each browser. Your X
 | --- | --- |
 | <img src="docs/screenshots/helium-popup.png" alt="Focus enabled in Helium’s toolbar popup" width="320"> | <img src="docs/screenshots/zen-popup.png" alt="Focus enabled in Zen’s toolbar popup" width="320"> |
 
-Instagram redirected to the local block screen with Focus on:
+Blocked pages show only “no.”; stop Focus from the toolbar popup:
 
 <img src="docs/screenshots/blocked.png" alt="Focus blocks Instagram while a session is active" width="650">
 

@@ -1,6 +1,6 @@
 {
   "name": "the-go-be-useful-extension",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "type": "module",
   "description": "Focus: local posting-only X and distraction blocking for Helium and Zen",

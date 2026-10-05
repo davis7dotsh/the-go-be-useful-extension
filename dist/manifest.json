@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Focus",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Go be useful. X posting only, Instagram blocked, YouTube Studio only.",
   "minimum_chrome_version": "120",
   "permissions": [
@@ -48,7 +48,6 @@
     {
       "resources": [
         "blocked/index.html",
-        "blocked/index.js",
         "blocked/styles.css"
       ],
       "matches": [

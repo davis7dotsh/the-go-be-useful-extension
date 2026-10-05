@@ -6,7 +6,7 @@ if (browser !== 'helium' && browser !== 'zen') throw new Error(`Unknown browser:
 const outdir = browser === 'zen' ? 'dist-zen' : 'dist';
 await mkdir(outdir, { recursive: true });
 for (const entry of await readdir(outdir)) await rm(`${outdir}/${entry}`, { recursive: true, force: true });
-await build({ entryPoints: ['src/background.ts', 'src/content/guard.ts', 'src/popup/index.ts', 'src/blocked/index.ts'], outdir, outbase: 'src', bundle: true, format: 'iife', target: browser === 'zen' ? 'firefox128' : 'chrome120', legalComments: 'none', loader: { '.css': 'text' } });
+await build({ entryPoints: ['src/background.ts', 'src/content/guard.ts', 'src/popup/index.ts'], outdir, outbase: 'src', bundle: true, format: 'iife', target: browser === 'zen' ? 'firefox128' : 'chrome120', legalComments: 'none', loader: { '.css': 'text' } });
 const manifest = JSON.parse(await readFile('src/manifest.json', 'utf8'));
 if (browser === 'zen') {
   delete manifest.minimum_chrome_version;
