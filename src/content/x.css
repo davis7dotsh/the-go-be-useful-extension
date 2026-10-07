@@ -5,6 +5,7 @@ html[data-focus-active] body [data-focus-allowed],
 html[data-focus-active] body [data-focus-allowed] * { visibility: visible !important; pointer-events: auto !important; }
 html[data-focus-active] body [data-focus-denied],
 html[data-focus-active] body [data-focus-denied] * { visibility: hidden !important; pointer-events: none !important; }
+html[data-focus-active] body [role="menu"] [role="menuitem"][data-focus-denied] { display: none !important; }
 #focus-cover { all: initial; display: flex !important; position: fixed !important; inset: 0 !important; z-index: 2147483644 !important; align-items: center !important; justify-content: center !important; background: #111113 !important; color: #ededed !important; font: 16px/1.5 "Focus Geist", system-ui, sans-serif !important; }
 #focus-cover * { box-sizing: border-box; }
 #focus-cover [hidden] { display: none !important; }

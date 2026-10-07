@@ -2,7 +2,7 @@
 
 Go be useful. A local browser extension for **Helium and Zen** that keeps social apps focused on creating.
 
-- **X:** your own profile’s Posts, your posts, and the native composer. Other routes return to your profile.
+- **X:** your own profile’s Posts, your posts, the native composer, and your posts’ three-dot menus for pinning. Other routes return to your profile.
 - **Instagram:** blocked.
 - **YouTube:** blocked; YouTube Studio stays available.
 - One toggle, with sessions of 25, 50, 90 minutes, or until stopped. Existing X drafts stay in place when recognized.

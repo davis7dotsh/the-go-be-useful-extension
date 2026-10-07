@@ -56,7 +56,7 @@
   }
 
   // src/content/x.css
-  var x_default = '@font-face { font-family: "Focus Geist"; src: url("__FOCUS_FONT_URL__") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }\nhtml[data-focus-active] body { visibility: hidden !important; background: transparent !important; position: relative !important; z-index: 2147483645 !important; }\nhtml[data-focus-active] body * { visibility: hidden !important; pointer-events: none !important; }\nhtml[data-focus-active] body [data-focus-allowed],\nhtml[data-focus-active] body [data-focus-allowed] * { visibility: visible !important; pointer-events: auto !important; }\nhtml[data-focus-active] body [data-focus-denied],\nhtml[data-focus-active] body [data-focus-denied] * { visibility: hidden !important; pointer-events: none !important; }\n#focus-cover { all: initial; display: flex !important; position: fixed !important; inset: 0 !important; z-index: 2147483644 !important; align-items: center !important; justify-content: center !important; background: #111113 !important; color: #ededed !important; font: 16px/1.5 "Focus Geist", system-ui, sans-serif !important; }\n#focus-cover * { box-sizing: border-box; }\n#focus-cover [hidden] { display: none !important; }\n#focus-cover .focus-panel { width: min(420px, calc(100vw - 48px)); text-align: center; }\n#focus-cover h1 { color: #ededed; font: 600 26px/1.25 "Focus Geist", system-ui, sans-serif; margin: 0 0 16px; }\n#focus-cover p { color: #939398; font: 400 16px/1.5 "Focus Geist", system-ui, sans-serif; margin: 0 0 24px; }\n#focus-cover button { border: 0; background: #4DABF7; color: #111; border-radius: 8px; padding: 12px 20px; font: 600 15px/1.2 "Focus Geist", system-ui, sans-serif; cursor: pointer; }\n#focus-cover button:focus-visible { outline: 2px solid #4DABF7; outline-offset: 4px; }\n#focus-cover button:disabled { opacity: .6; cursor: default; }\n\n#focus-compose-control { position: fixed !important; bottom: 24px !important; right: 24px !important; z-index: 2147483647 !important; padding: 12px 20px !important; border: 0 !important; border-radius: 8px !important; background: #4DABF7 !important; color: #111 !important; font: 600 15px/1.2 "Focus Geist", system-ui, sans-serif !important; cursor: pointer !important; }\n#focus-compose-control[hidden] { display: none !important; }\n';
+  var x_default = '@font-face { font-family: "Focus Geist"; src: url("__FOCUS_FONT_URL__") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }\nhtml[data-focus-active] body { visibility: hidden !important; background: transparent !important; position: relative !important; z-index: 2147483645 !important; }\nhtml[data-focus-active] body * { visibility: hidden !important; pointer-events: none !important; }\nhtml[data-focus-active] body [data-focus-allowed],\nhtml[data-focus-active] body [data-focus-allowed] * { visibility: visible !important; pointer-events: auto !important; }\nhtml[data-focus-active] body [data-focus-denied],\nhtml[data-focus-active] body [data-focus-denied] * { visibility: hidden !important; pointer-events: none !important; }\nhtml[data-focus-active] body [role="menu"] [role="menuitem"][data-focus-denied] { display: none !important; }\n#focus-cover { all: initial; display: flex !important; position: fixed !important; inset: 0 !important; z-index: 2147483644 !important; align-items: center !important; justify-content: center !important; background: #111113 !important; color: #ededed !important; font: 16px/1.5 "Focus Geist", system-ui, sans-serif !important; }\n#focus-cover * { box-sizing: border-box; }\n#focus-cover [hidden] { display: none !important; }\n#focus-cover .focus-panel { width: min(420px, calc(100vw - 48px)); text-align: center; }\n#focus-cover h1 { color: #ededed; font: 600 26px/1.25 "Focus Geist", system-ui, sans-serif; margin: 0 0 16px; }\n#focus-cover p { color: #939398; font: 400 16px/1.5 "Focus Geist", system-ui, sans-serif; margin: 0 0 24px; }\n#focus-cover button { border: 0; background: #4DABF7; color: #111; border-radius: 8px; padding: 12px 20px; font: 600 15px/1.2 "Focus Geist", system-ui, sans-serif; cursor: pointer; }\n#focus-cover button:focus-visible { outline: 2px solid #4DABF7; outline-offset: 4px; }\n#focus-cover button:disabled { opacity: .6; cursor: default; }\n\n#focus-compose-control { position: fixed !important; bottom: 24px !important; right: 24px !important; z-index: 2147483647 !important; padding: 12px 20px !important; border: 0 !important; border-radius: 8px !important; background: #4DABF7 !important; color: #111 !important; font: 600 15px/1.2 "Focus Geist", system-ui, sans-serif !important; cursor: pointer !important; }\n#focus-compose-control[hidden] { display: none !important; }\n';
 
   // src/content/x.ts
   var PageShield = class {
@@ -284,6 +284,23 @@
     }
     return allowed.filter((root) => !allowed.some((other) => other !== root && root.contains(other)));
   }
+  function postManagementMenus() {
+    return [...document.querySelectorAll('[role="menu"]')].filter((menu) => {
+      if (!visible(menu) || menu.querySelector('[data-testid="tweet"], nav, aside')) return false;
+      const pin = menu.querySelector('[role="menuitem"][data-testid="pin"], [role="menuitem"][data-testid="unpin"]');
+      const ownPost = [...menu.querySelectorAll('[role="menuitem"]')].some((item) => item.textContent?.trim() === "Delete");
+      return !!pin && /^(?:Pin to your profile|Unpin from profile)$/i.test(pin.textContent?.trim() ?? "") && ownPost;
+    });
+  }
+  function postPinConfirmations() {
+    return [...document.querySelectorAll('[data-testid="confirmationSheetDialog"]')].filter((sheet) => {
+      if (!visible(sheet) || sheet.querySelector('[data-testid="tweet"], nav, aside')) return false;
+      const heading = sheet.querySelector('[data-testid="confirmationSheetTitle"], h1[role="heading"]')?.textContent?.trim() ?? "";
+      const confirm = sheet.querySelector('[data-testid="confirmationSheetConfirm"]')?.textContent?.trim() ?? "";
+      const cancel = sheet.querySelector('[data-testid="confirmationSheetCancel"]');
+      return !!cancel && (/^Pin (?:this )?post(?: to (?:your )?profile)?\?$/i.test(heading) && confirm === "Pin" || /^Unpin (?:this )?post(?: from (?:your )?profile)?\?$/i.test(heading) && confirm === "Unpin");
+    });
+  }
   var XGuard = class {
     constructor(shield, profile = () => null, onProfile = () => {
     }) {
@@ -374,13 +391,27 @@
         const statusPath = new RegExp(`^/${this.profile()}/status/[0-9]+/?$`, "i").test(location.pathname);
         const names = primary?.querySelectorAll('[data-testid="UserName"], [data-testid="User-Name"]');
         const identified = names && [...names].some((name) => ownHandle.test(name.textContent ?? "") && (statusPath ? !!name.closest('[data-testid="tweet"]')?.querySelector(`a[href="${location.pathname.replace(/\/$/, "")}"]`) : !name.closest('[data-testid="tweet"]')));
+        if (primary && identified) {
+          const confirmations = postPinConfirmations();
+          if (confirmations.length) {
+            this.shield.allow(confirmations);
+            this.shield.show("composing");
+            return;
+          }
+        }
         if (primary && visible(primary) && identified) {
           const denied = new Set(Array.from(primary.querySelectorAll('aside, [role="tab"]')).filter((node) => node.getAttribute("role") !== "tab" || (node.textContent ?? "").trim() !== "Posts"));
           for (const user of primary.querySelectorAll('[data-testid="UserCell"]')) denied.add(user.closest('[data-testid="cellInnerDiv"]') ?? user);
           for (const heading of primary.querySelectorAll('h1, h2, h3, [role="heading"]')) {
             if ((heading.textContent ?? "").trim() === "Who to follow") denied.add(heading.closest('[data-testid="cellInnerDiv"]') ?? heading);
           }
-          this.shield.allow([primary], [...denied]);
+          const menus = postManagementMenus();
+          for (const menu of menus) {
+            for (const item of menu.querySelectorAll('[role="menuitem"]')) {
+              if (!item.matches('[data-testid="pin"], [data-testid="unpin"]')) denied.add(item);
+            }
+          }
+          this.shield.allow([primary, ...menus], [...denied]);
           this.shield.show("composing");
           this.shield.setProfile(this.profile(), () => {
             const native = document.querySelector('a[href="/compose/post"]');

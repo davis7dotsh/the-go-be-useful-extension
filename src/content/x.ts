@@ -235,6 +235,27 @@ function composerSubdialogs(composer: HTMLElement | null) {
   return allowed.filter(root => !allowed.some(other => other !== root && root.contains(other)));
 }
 
+// X renders own-post actions in a portal outside primaryColumn.
+function postManagementMenus() {
+  return [...document.querySelectorAll<HTMLElement>('[role="menu"]')].filter(menu => {
+    if (!visible(menu) || menu.querySelector('[data-testid="tweet"], nav, aside')) return false;
+    const pin = menu.querySelector<HTMLElement>('[role="menuitem"][data-testid="pin"], [role="menuitem"][data-testid="unpin"]');
+    const ownPost = [...menu.querySelectorAll<HTMLElement>('[role="menuitem"]')].some(item => item.textContent?.trim() === 'Delete');
+    return !!pin && /^(?:Pin to your profile|Unpin from profile)$/i.test(pin.textContent?.trim() ?? '') && ownPost;
+  });
+}
+
+function postPinConfirmations() {
+  return [...document.querySelectorAll<HTMLElement>('[data-testid="confirmationSheetDialog"]')].filter(sheet => {
+    if (!visible(sheet) || sheet.querySelector('[data-testid="tweet"], nav, aside')) return false;
+    const heading = sheet.querySelector('[data-testid="confirmationSheetTitle"], h1[role="heading"]')?.textContent?.trim() ?? '';
+    const confirm = sheet.querySelector('[data-testid="confirmationSheetConfirm"]')?.textContent?.trim() ?? '';
+    const cancel = sheet.querySelector('[data-testid="confirmationSheetCancel"]');
+    return !!cancel && ((/^Pin (?:this )?post(?: to (?:your )?profile)?\?$/i.test(heading) && confirm === 'Pin') ||
+      (/^Unpin (?:this )?post(?: from (?:your )?profile)?\?$/i.test(heading) && confirm === 'Unpin'));
+  });
+}
+
 export class XGuard {
   private observer: MutationObserver;
   private timer: ReturnType<typeof setTimeout> | null = null;
@@ -317,13 +338,29 @@ export class XGuard {
       const statusPath = new RegExp(`^/${this.profile()}/status/[0-9]+/?$`, 'i').test(location.pathname);
       const names = primary?.querySelectorAll<HTMLElement>('[data-testid="UserName"], [data-testid="User-Name"]');
       const identified = names && [...names].some(name => ownHandle.test(name.textContent ?? '') && (statusPath ? !!name.closest('[data-testid="tweet"]')?.querySelector(`a[href="${location.pathname.replace(/\/$/, '')}"]`) : !name.closest('[data-testid="tweet"]')));
+      if (primary && identified) {
+        const confirmations = postPinConfirmations();
+        if (confirmations.length) {
+          // X may aria-hide the profile behind its native confirmation sheet.
+          this.shield.allow(confirmations);
+          this.shield.show('composing');
+          return;
+        }
+      }
       if (primary && visible(primary) && identified) {
         const denied = new Set(Array.from(primary.querySelectorAll<HTMLElement>('aside, [role="tab"]')).filter(node => node.getAttribute('role') !== 'tab' || (node.textContent ?? '').trim() !== 'Posts'));
         for (const user of primary.querySelectorAll<HTMLElement>('[data-testid="UserCell"]')) denied.add(user.closest<HTMLElement>('[data-testid="cellInnerDiv"]') ?? user);
         for (const heading of primary.querySelectorAll<HTMLElement>('h1, h2, h3, [role="heading"]')) {
           if ((heading.textContent ?? '').trim() === 'Who to follow') denied.add(heading.closest<HTMLElement>('[data-testid="cellInnerDiv"]') ?? heading);
         }
-        this.shield.allow([primary], [...denied]);
+        const menus = postManagementMenus();
+        // Only offer actions whose native confirmation remains available in Focus.
+        for (const menu of menus) {
+          for (const item of menu.querySelectorAll<HTMLElement>('[role="menuitem"]')) {
+            if (!item.matches('[data-testid="pin"], [data-testid="unpin"]')) denied.add(item);
+          }
+        }
+        this.shield.allow([primary, ...menus], [...denied]);
         this.shield.show('composing');
         this.shield.setProfile(this.profile(), () => {
           const native = document.querySelector<HTMLAnchorElement>('a[href="/compose/post"]');

@@ -172,3 +172,83 @@ test('inline drafts stay intact in their smallest safe subtree while overbroad f
     } finally { denied.cleanup(); }
   }
 });
+
+const ownProfile = '<nav id="nav">Navigation</nav><main data-testid="primaryColumn"><div data-testid="UserName">Ben @davis7</div><article data-testid="tweet"><button data-testid="caret">More</button></article></main>';
+const postMenu = (action: 'pin' | 'unpin') => `<div role="menu" id="post-menu"><div role="menuitem">Delete</div><div role="menuitem" data-testid="${action}" id="pin-action">${action === 'pin' ? 'Pin to your profile' : 'Unpin from profile'}</div></div>`;
+const pinSheet = (action: 'Pin' | 'Unpin') => `<div data-testid="confirmationSheetDialog" id="pin-sheet"><h1 role="heading">${action === 'Pin' ? 'Pin post to profile?' : 'Unpin post from profile?'}</h1><button data-testid="confirmationSheetConfirm" id="confirm">${action}</button><button data-testid="confirmationSheetCancel" id="cancel">Cancel</button></div>`;
+
+test('own-post menus inserted outside the profile support pin/unpin and keyboard interaction', async () => {
+  for (const action of ['pin', 'unpin'] as const) {
+    const f = fixture(`${ownProfile}<div id="layers"></div>`, 'https://x.com/davis7');
+    try {
+      f.broadcast(true, 'davis7');
+      f.document.querySelector('#layers')!.innerHTML = `${postMenu(action)}<div role="menu" id="other-menu"><div role="menuitem">Trending</div></div>`;
+      await new Promise(resolve => setTimeout(resolve, 0));
+      assert.ok(allowed(f.document.querySelector('#post-menu')));
+      const unsupported = f.document.querySelector<HTMLElement>('#post-menu [role="menuitem"]')!;
+      assert.ok(!allowed(unsupported));
+      assert.equal(unsupported.inert, true);
+      assert.ok(!allowed(f.document.querySelector('#other-menu')));
+      assert.equal(f.document.querySelector<HTMLElement>('#other-menu')?.inert, true);
+      for (const type of ['pointerdown', 'mousedown', 'click']) {
+        const event = new f.dom.window.MouseEvent(type, { bubbles: true, cancelable: true });
+        f.document.querySelector('#pin-action')!.dispatchEvent(event);
+        assert.equal(event.defaultPrevented, false, type);
+      }
+      const key = new f.dom.window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
+      f.document.querySelector('#pin-action')!.dispatchEvent(key);
+      assert.equal(key.defaultPrevented, false);
+      f.document.querySelector('#post-menu')!.remove();
+      await new Promise(resolve => setTimeout(resolve, 0));
+      assert.equal(f.document.querySelector<HTMLElement>('#layers')?.inert, true);
+      assert.equal(f.document.querySelector<HTMLElement>('#nav')?.inert, true);
+      f.broadcast(false);
+      assert.equal(f.document.querySelector('[data-focus-allowed], [data-focus-denied], [data-focus-path]'), null);
+      assert.ok(!f.document.querySelector<HTMLElement>('#layers')?.inert);
+    } finally { f.cleanup(); }
+  }
+});
+
+test('pin confirmations remain usable when X aria-hides the profile and restore it on cancel', async () => {
+  for (const action of ['Pin', 'Unpin'] as const) {
+    const f = fixture(ownProfile, 'https://x.com/davis7');
+    try {
+      f.broadcast(true, 'davis7');
+      const primary = f.document.querySelector<HTMLElement>('[data-testid="primaryColumn"]')!;
+      primary.setAttribute('aria-hidden', 'true');
+      f.document.body.insertAdjacentHTML('beforeend', pinSheet(action));
+      await new Promise(resolve => setTimeout(resolve, 0));
+      assert.ok(allowed(f.document.querySelector('#pin-sheet')));
+      assert.equal(primary.inert, true);
+      for (const id of ['confirm', 'cancel']) {
+        const click = new f.dom.window.MouseEvent('click', { bubbles: true, cancelable: true });
+        f.document.querySelector(`#${id}`)!.dispatchEvent(click);
+        assert.equal(click.defaultPrevented, false, id);
+      }
+      f.document.querySelector('#pin-sheet')!.remove();
+      primary.removeAttribute('aria-hidden');
+      await new Promise(resolve => setTimeout(resolve, 0));
+      assert.ok(allowed(primary));
+      assert.ok(!primary.inert);
+    } finally { f.cleanup(); }
+  }
+});
+
+test('unrelated menus and confirmations cannot borrow own-post pin recognition', () => {
+  const unrelated = '<div role="menu" id="unrelated"><div role="menuitem">Delete</div><div role="menuitem">Pin to your profile</div></div>';
+  const deletion = '<div data-testid="confirmationSheetDialog" id="delete"><h1 data-testid="confirmationSheetTitle">Delete post?</h1><button data-testid="confirmationSheetConfirm">Delete</button><button data-testid="confirmationSheetCancel">Cancel</button></div>';
+  const f = fixture(`${ownProfile}${unrelated}${postMenu('pin')}${deletion}`, 'https://x.com/davis7');
+  try {
+    f.broadcast(true, 'davis7');
+    assert.ok(allowed(f.document.querySelector('#post-menu')));
+    for (const id of ['unrelated', 'delete']) {
+      assert.ok(!allowed(f.document.querySelector(`#${id}`)));
+      assert.equal(f.document.querySelector<HTMLElement>(`#${id}`)?.inert, true);
+    }
+  } finally { f.cleanup(); }
+  const foreign = fixture(`${ownProfile}${postMenu('pin')}${pinSheet('Pin')}`, 'https://x.com/another');
+  try {
+    foreign.broadcast(true, 'davis7');
+    assert.equal(foreign.document.querySelector('[data-focus-allowed]'), null);
+  } finally { foreign.cleanup(); }
+});
