@@ -252,3 +252,22 @@ test('unrelated menus and confirmations cannot borrow own-post pin recognition',
     assert.equal(foreign.document.querySelector('[data-focus-allowed]'), null);
   } finally { foreign.cleanup(); }
 });
+
+
+test('YouTube Music is never covered and playback is untouched by the content guard', () => {
+  const dom = new JSDOM('<!doctype html><html><body><audio></audio><button id="play">Play</button></body></html>', { url: 'https://music.youtube.com/watch?v=abc', runScripts: 'outside-only' });
+  try {
+    const media = dom.window.document.querySelector('audio')!;
+    let pauses = 0;
+    media.pause = () => { pauses++; };
+    // The allowed host must exit before accessing storage or installing listeners.
+    dom.window.eval(script);
+    media.dispatchEvent(new dom.window.Event('play', { bubbles: true }));
+    assert.equal(pauses, 0);
+    assert.equal(dom.window.document.querySelector('#focus-cover'), null);
+    assert.equal(dom.window.document.documentElement.hasAttribute('data-focus-active'), false);
+    const click = new dom.window.MouseEvent('click', { bubbles: true, cancelable: true });
+    dom.window.document.querySelector('#play')!.dispatchEvent(click);
+    assert.equal(click.defaultPrevented, false);
+  } finally { dom.window.close(); }
+});

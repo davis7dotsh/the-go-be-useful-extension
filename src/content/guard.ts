@@ -11,7 +11,7 @@ function install() {
     return;
   }
   const kind = classifyUrl(location.href).kind;
-  if (kind === 'unrestricted' || kind === 'youtube-studio') return;
+  if (kind === 'unrestricted' || kind === 'youtube-studio' || kind === 'youtube-music') return;
   const shield = new PageShield();
   let x: XGuard | null = null;
   let state: FocusState | null = null;

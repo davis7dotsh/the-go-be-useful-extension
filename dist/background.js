@@ -27,6 +27,7 @@
     }
     if (url.protocol !== "https:" && url.protocol !== "http:") return { kind: "unrestricted" };
     const hostname = url.hostname.toLowerCase();
+    if (hostname === "music.youtube.com") return { kind: "youtube-music" };
     if (hostname === "studio.youtube.com") return { kind: "youtube-studio" };
     if (hostMatches(hostname, "youtube.com")) return { kind: "youtube" };
     if (hostMatches(hostname, "instagram.com")) return { kind: "instagram" };
@@ -59,7 +60,7 @@
       redirect(2, "instagram.com", new URL("/blocked/index.html?site=instagram", extensionOrigin2).href),
       redirect(3, "x.com", profileDestination(handle)),
       redirect(4, "twitter.com", profileDestination(handle)),
-      allow(5, "^https?://studio\\.youtube\\.com(:[0-9]+)?(/|$)"),
+      allow(5, "^https?://(studio|music)\\.youtube\\.com(:[0-9]+)?(/|$)"),
       allow(6, `${canonicalX}/compose/post(/(media|tags|alt))?/?([?#]|$)`),
       allow(7, `${canonicalX}(${AUTH_PATHS.join("|")})/?([?#]|$)`),
       ...handle ? [allow(8, `${canonicalX}/${handle}(/status/[0-9]+)?/?([?#]|$)`)] : []
@@ -147,7 +148,8 @@
   }
   async function injectExistingGuards() {
     for (const tab of await relevantTabs()) {
-      if (tab.id === void 0 || classifyUrl(tab.url ?? "").kind === "youtube-studio") continue;
+      const kind = classifyUrl(tab.url ?? "").kind;
+      if (tab.id === void 0 || kind === "youtube-studio" || kind === "youtube-music") continue;
       try {
         await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ["content/guard.js"] });
       } catch {

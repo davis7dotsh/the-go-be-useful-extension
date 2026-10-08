@@ -35,7 +35,8 @@ export async function sendStateToTab(tabId: number, state: FocusState, profileHa
 
 export async function injectExistingGuards() {
   for (const tab of await relevantTabs()) {
-    if (tab.id === undefined || classifyUrl(tab.url ?? '').kind === 'youtube-studio') continue;
+    const kind = classifyUrl(tab.url ?? '').kind;
+    if (tab.id === undefined || kind === 'youtube-studio' || kind === 'youtube-music') continue;
     try { await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['content/guard.js'] }); }
     catch { /* Restricted browser pages or a tab closing during injection are recoverable. */ }
   }

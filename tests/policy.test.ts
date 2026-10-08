@@ -9,6 +9,12 @@ const cases = [
   ['https://youtube.com/watch?v=abc', 'youtube'],
   ['https://www.youtube.com/shorts/123', 'youtube'],
   ['https://m.youtube.com/results?search_query=hi', 'youtube'],
+  ['https://music.youtube.com/', 'youtube-music'],
+  ['https://music.youtube.com/watch?v=abc', 'youtube-music'],
+  ['https://music.youtube.com/playlist?list=abc', 'youtube-music'],
+  ['https://music.youtube.com.youtube.com/', 'youtube'],
+  ['https://music.youtube.com.evil.test/', 'unrestricted'],
+  ['https://www.music.youtube.com/', 'youtube'],
   ['https://studio.youtube.com/channel/123/videos/upload', 'youtube-studio'],
   ['https://studio.youtube.com.evil.test/', 'unrestricted'],
   ['https://studio.youtube.com.youtube.com/', 'youtube'],
@@ -44,16 +50,17 @@ function ruleFor(url: string) {
 test('generated main-frame rules match classifier with priority exceptions', () => {
   for (const [url, kind] of cases) {
     const rule = ruleFor(url);
-    const allowed = ['youtube-studio', 'x-compose', 'x-auth'].includes(kind);
+    const allowed = ['youtube-studio', 'youtube-music', 'x-compose', 'x-auth'].includes(kind);
     if (kind === 'unrestricted') assert.equal(rule, undefined, url);
     else assert.equal(rule?.action.type, allowed ? 'allow' : 'redirect', url);
   }
   assert.ok(rules.every(rule => rule.condition.resourceTypes?.length === 1 && rule.condition.resourceTypes[0] === 'main_frame'));
   assert.equal(new Set(rules.map(rule => rule.id)).size, rules.length);
 });
-test('existing composer and Studio require no navigation', () => {
+test('existing composer, Studio, and Music require no navigation', () => {
   assert.equal(destinationForUrl('https://x.com/compose/post?text=draft', origin), null);
   assert.equal(destinationForUrl('https://studio.youtube.com/', origin), null);
+  assert.equal(destinationForUrl('https://music.youtube.com/watch?v=abc', origin), null);
   assert.equal(destinationForUrl('https://twitter.com/home', origin), 'https://x.com/compose/post');
   assert.equal(destinationForUrl('https://youtube.com/watch?v=abc', origin), `${origin}blocked/index.html?site=youtube`);
 });

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Focus",
-  "version": "1.0.2",
-  "description": "Go be useful. X posting only, Instagram blocked, YouTube Studio only.",
+  "version": "1.0.3",
+  "description": "Go be useful. X posting only, Instagram blocked, YouTube Studio and Music allowed.",
   "minimum_chrome_version": "120",
   "permissions": [
     "storage",

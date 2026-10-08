@@ -4,7 +4,7 @@ Go be useful. A local browser extension for **Helium and Zen** that keeps social
 
 - **X:** your own profile’s Posts, your posts, the native composer, and your posts’ three-dot menus for pinning. Other routes return to your profile.
 - **Instagram:** blocked.
-- **YouTube:** blocked; YouTube Studio stays available.
+- **YouTube:** blocked; YouTube Studio and YouTube Music stay available.
 - One toggle, with sessions of 25, 50, 90 minutes, or until stopped. Existing X drafts stay in place when recognized.
 
 No server, tracking, account, or API keys. Sessions stay in each browser. Your X profile is detected from the signed-in page.

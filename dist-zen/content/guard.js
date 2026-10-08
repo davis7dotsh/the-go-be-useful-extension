@@ -25,6 +25,7 @@
     }
     if (url.protocol !== "https:" && url.protocol !== "http:") return { kind: "unrestricted" };
     const hostname = url.hostname.toLowerCase();
+    if (hostname === "music.youtube.com") return { kind: "youtube-music" };
     if (hostname === "studio.youtube.com") return { kind: "youtube-studio" };
     if (hostMatches(hostname, "youtube.com")) return { kind: "youtube" };
     if (hostMatches(hostname, "instagram.com")) return { kind: "instagram" };
@@ -457,7 +458,7 @@
       return;
     }
     const kind = classifyUrl(location.href).kind;
-    if (kind === "unrestricted" || kind === "youtube-studio") return;
+    if (kind === "unrestricted" || kind === "youtube-studio" || kind === "youtube-music") return;
     const shield = new PageShield();
     let x = null;
     let state = null;
